@@ -175,9 +175,9 @@ body {
 }
 .stat-value .unit { font-size: 14px; font-weight: 400; color: #6a9a7a; margin-left: 4px; }
 
-.stat-value.highlight-very-high { color: #a5d6a7; }
-.stat-value.highlight-high { color: #66bb6a; }
-.stat-value.highlight-low { color: #2e7d32; }
+.stat-value.highlight-very-high { color: #a5d6a7; } /* hijau sangat terang */
+.stat-value.highlight-high { color: #66bb6a; }      /* hijau terang */
+.stat-value.highlight-low { color: #2e7d32; } 
 
 .dashboard-main {
     display: grid;
@@ -297,8 +297,8 @@ body {
     gap: 10px;
 }
 .alert-item .a-time { color: #5a8a6a; font-size: 10px; white-space: nowrap; }
-.alert-item.alert-red { border-left-color: #a5d6a7; background: rgba(165,214,167,0.06); }
-.alert-item.alert-orange { border-left-color: #66bb6a; background: rgba(102,187,106,0.06); }
+.alert-item.alert-red { border-left-color: #f44336; background: rgba(244,67,54,0.06); }
+.alert-item.alert-orange { border-left-color: #ff9800; background: rgba(255,152,0,0.06); }
 
 .footer {
     margin-top: 28px;
@@ -345,6 +345,7 @@ body {
 .toast .toast-title { font-weight: 600; color: #b8f0c8; margin-bottom: 2px; }
 .toast .toast-body { color: #8aba9a; font-size: 12px; }
 
+/* Label kecamatan di peta */
 .kecamatan-label {
     font-size: 11px;
     font-weight: 600;

@@ -17,11 +17,11 @@
         wind: { min: 1, max: 22 }
     };
     const RISK_LEVELS = [
-        { key: 'very-low', label: 'Sangat Rendah', color: '#1b5e20', scoreMin: 0, scoreMax: 20 },
-        { key: 'low', label: 'Rendah', color: '#2e7d32', scoreMin: 21, scoreMax: 40 },
-        { key: 'medium', label: 'Sedang', color: '#43a047', scoreMin: 41, scoreMax: 60 },
-        { key: 'high', label: 'Tinggi', color: '#66bb6a', scoreMin: 61, scoreMax: 80 },
-        { key: 'very-high', label: 'Sangat Tinggi', color: '#a5d6a7', scoreMin: 81, scoreMax: 100 }
+        { key: 'very-low', label: 'Sangat Rendah', color: '#4caf50', scoreMin: 0, scoreMax: 20 },
+        { key: 'low', label: 'Rendah', color: '#8bc34a', scoreMin: 21, scoreMax: 40 },
+        { key: 'medium', label: 'Sedang', color: '#ffeb3b', scoreMin: 41, scoreMax: 60 },
+        { key: 'high', label: 'Tinggi', color: '#ff9800', scoreMin: 61, scoreMax: 80 },
+        { key: 'very-high', label: 'Sangat Tinggi', color: '#f44336', scoreMin: 81, scoreMax: 100 }
     ];
 
     let map, geoJsonLayer, fallbackCircles = [];
@@ -365,7 +365,7 @@
         const labels = ['Sangat Rendah', 'Rendah', 'Sedang', 'Tinggi', 'Sangat Tinggi'];
         const keys = ['very-low', 'low', 'medium', 'high', 'very-high'];
         const data = keys.map(k => counts[k] || 0);
-        const colors = ['#1b5e20', '#2e7d32', '#43a047', '#66bb6a', '#a5d6a7'];
+        const colors = ['#4caf50', '#8bc34a', '#ffeb3b', '#ff9800', '#f44336'];
 
         const ctx = document.getElementById('riskChart').getContext('2d');
         if (chartInstance) chartInstance.destroy();

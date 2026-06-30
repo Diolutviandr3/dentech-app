@@ -1,96 +1,2110 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DENTECH - Peta Risiko DBD DIY (Kecamatan)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DENTECH - Prediksi DBD DIY</title>
+
+    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
-    <link rel="stylesheet" href="style.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ================================================================
+           RESET & VARIABEL (tema biru seperti iBIN)
+           ================================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --primary-light: #3498db;
+            --primary-lighter: #5dade2;
+            --accent: #3498db;
+            --bg-body: #ecf0f1;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f5f7fa;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --text-muted: #95a5a6;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --border: #d5dbe0;
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ecf0f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 8px;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ================================================================
+           HEADER
+           ================================================================ */
+        header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            padding: 14px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 12px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(44, 62, 80, 0.3);
+        }
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .logo .sub {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 16px 6px 12px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+        }
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: #2ecc71;
+            border-radius: 50%;
+            animation: pulse-dot 1.4s ease-in-out infinite;
+            box-shadow: 0 0 12px rgba(46, 204, 113, 0.4);
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.3;
+                transform: scale(0.7);
+            }
+        }
+
+        .clock {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .update-info {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(0, 0, 0, 0.1);
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+
+        /* ================================================================
+           MAIN LAYOUT
+           ================================================================ */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            gap: 0;
+        }
+
+        /* ================================================================
+           SIDEBAR
+           ================================================================ */
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            padding: 20px 0;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            min-height: calc(100vh - 80px);
+            transition: var(--transition);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .sidebar-nav {
+            list-style: none;
+        }
+        .sidebar-nav li {
+            margin-bottom: 2px;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+            font-size: 14px;
+            gap: 12px;
+        }
+        .sidebar-nav a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-left-color: #3498db;
+            color: #fff;
+        }
+        .sidebar-nav a.active {
+            background: rgba(255, 255, 255, 0.08);
+            border-left-color: #3498db;
+            color: #fff;
+        }
+        .sidebar-nav i {
+            width: 22px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* ================================================================
+           MAIN CONTENT
+           ================================================================ */
+        .main-content {
+            flex: 1;
+            padding: 24px 28px;
+            overflow-y: auto;
+            background: var(--bg-body);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ================================================================
+           HERO
+           ================================================================ */
+        .hero {
+            background: linear-gradient(rgba(44, 62, 80, 0.85), rgba(44, 62, 80, 0.92)),
+                url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iODAiIGZpbGw9IiMyYzNlNTAiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSIxNSIgZmlsbD0iIzM0OThkYiIgb3BhY2l0eT0iMC4yIi8+PC9zdmc+');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 50px 0 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.85;
+            margin-bottom: 24px;
+        }
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(52, 152, 219, 0.4);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-3px);
+        }
+
+        /* ================================================================
+           DASHBOARD SECTION
+           ================================================================ */
+        .dashboard-section {
+            margin-bottom: 32px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px 26px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        .dashboard-section:hover {
+            border-color: #3498db;
+        }
+        .dashboard-section h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* ================================================================
+           STATS ROW
+           ================================================================ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        .stat-card:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+        .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            margin-top: 4px;
+            line-height: 1.2;
+        }
+        .stat-value .unit {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+        .stat-value.stat-very-high {
+            color: #e74c3c;
+        }
+        .stat-value.stat-high {
+            color: #e67e22;
+        }
+        .stat-value.stat-low {
+            color: #27ae60;
+        }
+
+        /* ================================================================
+           FILTER BAR
+           ================================================================ */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+            background: var(--bg-card);
+            padding: 10px 18px;
+            border-radius: 40px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .filter-bar label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text);
+            cursor: pointer;
+        }
+        .filter-bar input[type="checkbox"] {
+            accent-color: #3498db;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* ================================================================
+           MAP
+           ================================================================ */
+        #map {
+            height: 420px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .map-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            background: var(--bg-body);
+            padding: 5px 14px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text);
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* ================================================================
+           TABLE
+           ================================================================ */
+        .table-wrapper {
+            margin-top: 20px;
+        }
+        .table-wrapper h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+        .table-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            background: var(--bg-body);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .table-wrapper th {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .table-wrapper td {
+            padding: 7px 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+        .table-wrapper tr:hover td {
+            background: rgba(52, 152, 219, 0.04);
+        }
+        .risk-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* ================================================================
+           RIGHT SIDEBAR
+           ================================================================ */
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .side-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 18px 20px 20px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        .side-card:hover {
+            border-color: #3498db;
+        }
+        .side-card h3 {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+        .chart-wrap {
+            position: relative;
+            height: 160px;
+        }
+        .chart-wrap canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .dist-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .dist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .dist-item .d-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dist-item .d-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+        }
+        .dist-item .d-count {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* ================================================================
+           ALERT LOG
+           ================================================================ */
+        .alert-log {
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .alert-item {
+            font-size: 12px;
+            padding: 6px 10px;
+            background: var(--bg-body);
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .alert-item .a-time {
+            color: var(--text-muted);
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        .alert-item.alert-red {
+            border-left-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.06);
+        }
+        .alert-item.alert-orange {
+            border-left-color: #e67e22;
+            background: rgba(230, 126, 34, 0.06);
+        }
+
+        /* ================================================================
+           TOAST
+           ================================================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 22px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            color: var(--text);
+            font-size: 13px;
+            max-width: 380px;
+            z-index: 999;
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .toast .toast-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+        .toast .toast-body {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+
+        /* ================================================================
+           FOOTER
+           ================================================================ */
+        footer {
+            background: #2c3e50;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px 0;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: auto;
+        }
+        footer .sources {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+        footer .badge {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* ================================================================
+           RESPONSIVE
+           ================================================================ */
+        @media (max-width: 1024px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .main-content {
+                padding: 16px;
+            }
+            .right-sidebar {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+            .stats-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            #map {
+                height: 320px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+            .logo h1 {
+                font-size: 1.4rem;
+            }
+            .logo .sub {
+                font-size: 9px;
+            }
+            .header-controls {
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .live-badge {
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+            .clock {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            .update-info {
+                font-size: 10px;
+                padding: 2px 10px;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .right-sidebar {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            #map {
+                height: 250px;
+            }
+            .filter-bar {
+                border-radius: 20px;
+                padding: 8px 14px;
+                gap: 8px 14px;
+            }
+            .filter-bar label {
+                font-size: 11px;
+            }
+            .table-wrapper table {
+                font-size: 10px;
+            }
+            .table-wrapper th,
+            .table-wrapper td {
+                padding: 4px 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-card {
+                padding: 10px 12px;
+            }
+            .stat-value {
+                font-size: 20px;
+            }
+            #map {
+                height: 200px;
+            }
+            .dashboard-section {
+                padding: 14px 16px;
+            }
+            .hero {
+                padding: 30px 0 24px;
+            }
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+        }
+
+        /* Leaflet tooltip custom */
+        .kecamatan-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 0 6px rgba(0, 0, 0, 0.9), 0 0 3px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .leaflet-popup-content {
+            color: #222;
+            font-size: 13px;
+        }
+
+        /* Analitik grid */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .analytics-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 18px 20px 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .analytics-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 14px;
+        }
+        .analytics-card .chart-wrap {
+            height: 220px;
+        }
+    </style>
 </head>
 <body>
+
+    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast">
         <div class="toast-title" id="toastTitle">⚠️ Peringatan DBD</div>
         <div class="toast-body" id="toastBody">Wilayah Yogyakarta masuk tingkat risiko TINGGI.</div>
     </div>
 
-    <div class="app-container">
-        <header class="header">
-            <div class="brand">
-                <div class="brand-icon">D</div>
-                <div>
-                    <h1>DENTECH</h1>
-                    <div class="sub">Prediksi DBD DIY &bull; Real-Time</div>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="live-badge"><span class="live-dot"></span><span>LIVE</span></div>
-                <div class="clock" id="clock">--:--:--</div>
-                <div class="update-info" id="updateInfo">Diperbarui: baru saja</div>
-            </div>
-        </header>
-
-        <div class="stats-row" id="statsRow">
-            <div class="stat-card"><div class="stat-label">Total Kecamatan</div><div class="stat-value" id="totalRegions">0</div></div>
-            <div class="stat-card"><div class="stat-label">Risiko Sangat Tinggi</div><div class="stat-value highlight-very-high" id="veryHighCount">0</div></div>
-            <div class="stat-card"><div class="stat-label">Risiko Tinggi</div><div class="stat-value highlight-high" id="highCount">0</div></div>
-            <div class="stat-card"><div class="stat-label">Risiko Rendah / SR</div><div class="stat-value highlight-low" id="lowCount">0</div></div>
-            <div class="stat-card"><div class="stat-label">Rata-rata Suhu</div><div class="stat-value" id="avgTemp">-- <span class="unit">°C</span></div></div>
-            <div class="stat-card"><div class="stat-label">Rata-rata Curah Hujan</div><div class="stat-value" id="avgRain">-- <span class="unit">mm</span></div></div>
-        </div>
-
-        <div class="dashboard-main">
-            <section class="map-section">
-                <div class="map-header">
-                    <h2>Peta Risiko DBD per Kecamatan DIY</h2>
-                    <div class="legend">
-                        <span class="legend-item"><span class="legend-color" style="background:#1b5e20;"></span> Sangat Rendah</span>
-                        <span class="legend-item"><span class="legend-color" style="background:#2e7d32;"></span> Rendah</span>
-                        <span class="legend-item"><span class="legend-color" style="background:#43a047;"></span> Sedang</span>
-                        <span class="legend-item"><span class="legend-color" style="background:#66bb6a;"></span> Tinggi</span>
-                        <span class="legend-item"><span class="legend-color" style="background:#a5d6a7;"></span> Sangat Tinggi</span>
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <div class="logo-icon">D</div>
+                    <div>
+                        <h1>DENTECH</h1>
+                        <div class="sub">Prediksi DBD DIY · Real-Time</div>
                     </div>
                 </div>
-                <div id="map" style="height: 500px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(40,120,70,0.15);"></div>
+                <div class="header-controls">
+                    <div class="live-badge">
+                        <span class="live-dot"></span>
+                        <span>LIVE</span>
+                    </div>
+                    <div class="clock" id="clock">--:--:--</div>
+                    <div class="update-info" id="updateInfo">Diperbarui: baru saja</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN LAYOUT ===== -->
+    <div class="main-layout">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="#dashboard" class="sidebar-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#map-tab" class="sidebar-link"><i class="fas fa-map"></i> Peta Risiko</a></li>
+                    <li><a href="#data-tab" class="sidebar-link"><i class="fas fa-table"></i> Data Kecamatan</a></li>
+                    <li><a href="#analytics-tab" class="sidebar-link"><i class="fas fa-chart-bar"></i> Analitik</a></li>
+                    <li><a href="#about-tab" class="sidebar-link"><i class="fas fa-info-circle"></i> Tentang</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+
+            <!-- ===== TAB: DASHBOARD ===== -->
+            <section id="dashboard" class="tab-content active">
+                <!-- Hero -->
+                <div class="hero">
+                    <div class="hero-content">
+                        <h1>DENTECH</h1>
+                        <p>Prediksi Penyebaran DBD di DIY berbasis data cuaca real-time dari BMKG &amp; BPBD</p>
+                        <div class="hero-buttons">
+                            <a href="#map-tab" class="btn btn-primary map-nav-btn">
+                                <i class="fas fa-map"></i> Lihat Peta Risiko
+                            </a>
+                            <a href="#about-tab" class="btn btn-secondary">
+                                <i class="fas fa-info-circle"></i> Pelajari
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistik -->
+                <div class="stats-row" id="statsRow">
+                    <div class="stat-card"><div class="stat-label">Total Kecamatan</div><div class="stat-value" id="totalRegions">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Sangat Tinggi</div><div class="stat-value stat-very-high" id="veryHighCount">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Tinggi</div><div class="stat-value stat-high" id="highCount">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Rendah / SR</div><div class="stat-value stat-low" id="lowCount">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Rata-rata Suhu</div><div class="stat-value" id="avgTemp">-- <span class="unit">°C</span></div></div>
+                    <div class="stat-card"><div class="stat-label">Rata-rata Hujan</div><div class="stat-value" id="avgRain">-- <span class="unit">mm</span></div></div>
+                </div>
+
+                <!-- Filter -->
+                <div class="filter-bar">
+                    <span class="filter-label">🎯 Filter Risiko:</span>
+                    <label><input type="checkbox" class="risk-filter" value="very-low" checked /> Sangat Rendah</label>
+                    <label><input type="checkbox" class="risk-filter" value="low" checked /> Rendah</label>
+                    <label><input type="checkbox" class="risk-filter" value="medium" checked /> Sedang</label>
+                    <label><input type="checkbox" class="risk-filter" value="high" checked /> Tinggi</label>
+                    <label><input type="checkbox" class="risk-filter" value="very-high" checked /> Sangat Tinggi</label>
+                </div>
+
+                <!-- Peta -->
+                <div class="dashboard-section">
+                    <div class="map-header">
+                        <h2>🗺️ Peta Risiko DBD per Kecamatan DIY</h2>
+                        <div class="legend">
+                            <span class="legend-item"><span class="legend-color" style="background:#27ae60;"></span> Sangat Rendah</span>
+                            <span class="legend-item"><span class="legend-color" style="background:#2e86c1;"></span> Rendah</span>
+                            <span class="legend-item"><span class="legend-color" style="background:#f1c40f;"></span> Sedang</span>
+                            <span class="legend-item"><span class="legend-color" style="background:#e67e22;"></span> Tinggi</span>
+                            <span class="legend-item"><span class="legend-color" style="background:#e74c3c;"></span> Sangat Tinggi</span>
+                        </div>
+                    </div>
+                    <div id="map"></div>
+                </div>
+
+                <!-- Tabel -->
+                <div class="dashboard-section">
+                    <div class="table-wrapper">
+                        <h3>📋 Data Kecamatan</h3>
+                        <div style="overflow-x:auto;">
+                            <table id="kecamatanTable">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kecamatan</th>
+                                        <th>Kabupaten</th>
+                                        <th>Suhu (°C)</th>
+                                        <th>Hujan (mm)</th>
+                                        <th>Kelembapan (%)</th>
+                                        <th>Angin (km/h)</th>
+                                        <th>Risiko</th>
+                                        <th>Skor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                    <!-- diisi JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <aside class="sidebar">
-                <div class="side-card">
-                    <h3>📊 Distribusi Risiko</h3>
-                    <div class="chart-wrap"><canvas id="riskChart"></canvas></div>
-                </div>
-                <div class="side-card">
-                    <h3>📋 Ringkasan Risiko</h3>
-                    <div class="dist-list" id="distList">
-                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#1b5e20;"></span>Sangat Rendah</span><span class="d-count" id="distVeryLow">0</span></div>
-                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#2e7d32;"></span>Rendah</span><span class="d-count" id="distLow">0</span></div>
-                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#43a047;"></span>Sedang</span><span class="d-count" id="distMedium">0</span></div>
-                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#66bb6a;"></span>Tinggi</span><span class="d-count" id="distHigh">0</span></div>
-                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#a5d6a7;"></span>Sangat Tinggi</span><span class="d-count" id="distVeryHigh">0</span></div>
+            <!-- ===== TAB: PETA RISIKO ===== -->
+            <section id="map-tab" class="tab-content">
+                <div class="dashboard-section">
+                    <div class="map-header">
+                        <h2>🗺️ Peta Risiko DBD per Kecamatan DIY</h2>
+                        <div class="legend">
+                            <span class="legend-item"><span class="legend-color" style="background:#27ae60;"></span> Sangat Rendah</span>
+                            <span class="legend-item"><span class="legend-color" style="background:#2e86c1;"></span> Rendah</span>
+                            <span class="legend-item"><span class="legend-color" style="background:#f1c40f;"></span> Sedang</span>
+                            <span class="legend-item"><span class="legend-color" style="background:#e67e22;"></span> Tinggi</span>
+                            <span class="legend-item"><span class="legend-color" style="background:#e74c3c;"></span> Sangat Tinggi</span>
+                        </div>
                     </div>
+                    <div id="map2" style="height:500px; border-radius:16px; overflow:hidden; border:1px solid var(--border);"></div>
                 </div>
-                <div class="side-card">
-                    <h3>🔔 Log Peringatan</h3>
-                    <div class="alert-log" id="alertLog">
-                        <div class="alert-item" style="color:#5a8a6a; font-style:italic; border-left-color:#2a5a3a;">Menunggu data...</div>
-                    </div>
-                </div>
-            </aside>
-        </div>
+            </section>
 
-        <footer class="footer">
+            <!-- ===== TAB: DATA KECAMATAN ===== -->
+            <section id="data-tab" class="tab-content">
+                <div class="dashboard-section">
+                    <h2>📋 Data Lengkap Kecamatan (78 Kecamatan)</h2>
+                    <div class="filter-bar" style="margin-bottom:16px;">
+                        <span class="filter-label">🔍 Cari:</span>
+                        <input type="text" id="searchKecamatan" placeholder="Cari nama kecamatan..." style="padding:6px 12px; border-radius:20px; border:1px solid var(--border); flex:1; min-width:150px; background:var(--bg-body);">
+                        <span class="filter-label">Kabupaten:</span>
+                        <select id="filterKabupaten" style="padding:6px 12px; border-radius:20px; border:1px solid var(--border); background:var(--bg-body);">
+                            <option value="all">Semua</option>
+                            <option value="Kota Yogyakarta">Kota Yogyakarta</option>
+                            <option value="Sleman">Sleman</option>
+                            <option value="Bantul">Bantul</option>
+                            <option value="Kulon Progo">Kulon Progo</option>
+                            <option value="Gunungkidul">Gunungkidul</option>
+                        </select>
+                        <button id="resetFilterBtn" style="padding:6px 16px; border-radius:20px; border:1px solid var(--border); background:var(--primary); color:#fff; cursor:pointer;">Reset</button>
+                        <span style="margin-left:auto; font-size:13px; color:var(--text-muted);" id="totalKecamatanDisplay">Total: 0 kecamatan</span>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table id="kecamatanTable2" style="width:100%; border-collapse:collapse; font-size:12px;">
+                            <thead>
+                                <tr style="background:var(--primary); color:#fff;">
+                                    <th style="padding:8px 10px; text-align:left;">No</th>
+                                    <th style="padding:8px 10px; text-align:left;">Kecamatan</th>
+                                    <th style="padding:8px 10px; text-align:left;">Kabupaten</th>
+                                    <th style="padding:8px 10px; text-align:left;">Suhu (°C)</th>
+                                    <th style="padding:8px 10px; text-align:left;">Hujan (mm)</th>
+                                    <th style="padding:8px 10px; text-align:left;">Kelembapan (%)</th>
+                                    <th style="padding:8px 10px; text-align:left;">Angin (km/h)</th>
+                                    <th style="padding:8px 10px; text-align:left;">Risiko</th>
+                                    <th style="padding:8px 10px; text-align:left;">Skor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody2">
+                                <!-- diisi JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; flex-wrap:wrap; gap:8px;">
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button id="prevPageBtn" style="padding:4px 12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-body); cursor:pointer;">◀ Prev</button>
+                            <span id="pageInfo" style="font-size:13px; color:var(--text-muted);">Halaman 1 dari 1</span>
+                            <button id="nextPageBtn" style="padding:4px 12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-body); cursor:pointer;">Next ▶</button>
+                        </div>
+                        <div style="display:flex; gap:8px; align-items:center; font-size:13px; color:var(--text-muted);">
+                            <label>Baris per halaman:</label>
+                            <select id="rowsPerPage" style="padding:4px 8px; border-radius:6px; border:1px solid var(--border); background:var(--bg-body);">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== TAB: ANALITIK ===== -->
+            <section id="analytics-tab" class="tab-content">
+                <div class="dashboard-section">
+                    <h2>📊 Analitik Risiko DBD</h2>
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>Distribusi Risiko</h3>
+                            <div class="chart-wrap"><canvas id="riskChartAnalytics"></canvas></div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Suhu &amp; Curah Hujan (10 kecamatan teratas)</h3>
+                            <div class="chart-wrap"><canvas id="climateChartAnalytics"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-section">
+                    <h2>📈 Tren Risiko (simulasi 7 hari terakhir)</h2>
+                    <div class="analytics-card" style="border:none; box-shadow:none; padding:0;">
+                        <div class="chart-wrap" style="height:220px;"><canvas id="trendChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== TAB: TENTANG ===== -->
+            <section id="about-tab" class="tab-content">
+                <div class="dashboard-section">
+                    <h2>Tentang DENTECH</h2>
+                    <div style="background:var(--bg-card); border-radius:var(--radius); padding:24px; border:1px solid var(--border);">
+                        <h3 style="color:var(--primary); margin-bottom:16px;">Prediksi Penyebaran DBD di DIY</h3>
+                        <p style="margin-bottom:16px; line-height:1.8; color:var(--text);">
+                            <strong>DENTECH</strong> adalah aplikasi berbasis web yang dirancang untuk memprediksi
+                            penyebaran Demam Berdarah Dengue (DBD) di Provinsi Daerah Istimewa Yogyakarta.
+                            Aplikasi ini menggunakan data cuaca real-time (suhu, curah hujan, kelembapan,
+                            dan kecepatan angin) dari BMKG dan data historis dari BPBD untuk memberikan
+                            peringatan dini kepada pemerintah dan tenaga kesehatan.
+                        </p>
+                        <h4 style="color:var(--primary); margin:20px 0 12px;">Fitur Utama</h4>
+                        <ul style="list-style:none; padding:0; color:var(--text);">
+                            <li style="padding:6px 0; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+                                <i class="fas fa-map" style="color:#3498db;"></i> Peta interaktif dengan warna risiko per kecamatan
+                            </li>
+                            <li style="padding:6px 0; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+                                <i class="fas fa-chart-pie" style="color:#3498db;"></i> Grafik distribusi risiko dan tren
+                            </li>
+                            <li style="padding:6px 0; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+                                <i class="fas fa-filter" style="color:#3498db;"></i> Filter risiko untuk fokus pada wilayah tertentu
+                            </li>
+                            <li style="padding:6px 0; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+                                <i class="fas fa-bell" style="color:#3498db;"></i> Notifikasi peringatan ketika risiko tinggi / sangat tinggi
+                            </li>
+                            <li style="padding:6px 0; display:flex; align-items:center; gap:10px;">
+                                <i class="fas fa-table" style="color:#3498db;"></i> Tabel data lengkap setiap kecamatan
+                            </li>
+                        </ul>
+                        <h4 style="color:var(--primary); margin:20px 0 12px;">Data Sumber</h4>
+                        <p style="color:var(--text);">
+                            <span class="badge" style="background:rgba(52,152,219,0.1); padding:2px 12px; border-radius:20px; color:#2c3e50;">BMKG</span>
+                            Suhu, Curah Hujan, Kelembapan, Kecepatan Angin (real-time simulasi)
+                            <br>
+                            <span class="badge" style="background:rgba(52,152,219,0.1); padding:2px 12px; border-radius:20px; color:#2c3e50;">BPBD</span>
+                            Data historis penyebaran DBD di DIY
+                            <br>
+                            <span class="badge" style="background:rgba(52,152,219,0.1); padding:2px 12px; border-radius:20px; color:#2c3e50;">GeoJSON</span>
+                            Batas administrasi kecamatan DIY dari sumber terbuka
+                        </p>
+                        <p style="margin-top:20px; color:var(--text-muted); font-size:13px;">
+                            &copy; 2026 DENTECH · v2.1 · Tujuan: mendukung pencegahan dan regulasi penanganan DBD
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container">
             <div class="sources">
-                <span>📡 <span class="badge">BMKG</span> Suhu · Curah Hujan · Kelembapan · Angin</span>
+                <span>📡 <span class="badge">BMKG</span> Suhu · Hujan · Kelembapan · Angin</span>
                 <span>🛡️ <span class="badge">BPBD</span> Data Historis DBD</span>
                 <span>🗺️ <span class="badge">GeoJSON</span> Batas Kecamatan DIY</span>
             </div>
-            <div>&copy; 2026 DENTECH &bull; v2.0 (Peta Kecamatan)</div>
-        </footer>
-    </div>
+            <p>&copy; 2026 DENTECH · Inovasi untuk Pencegahan DBD</p>
+        </div>
+    </footer>
 
-    <script src="script.js"></script>
+    <script>
+        // ================================================================
+        //  DENTECH - SCRIPT UTAMA dengan data kecamatan lengkap
+        // ================================================================
+
+        (function() {
+            'use strict';
+
+            // ---- DATA KECAMATAN LENGKAP DIY (78 kecamatan) ----
+            const ALL_KECAMATAN = [
+                // Kota Yogyakarta (14)
+                { nama: 'Danurejan', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Gedong Tengen', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Gondokusuman', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Gondomanan', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Jetis', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Kotagede', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Kraton', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Mantrijeron', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Mergangsan', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Ngampilan', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Pakualaman', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Tegalrejo', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Umbulharjo', kabupaten: 'Kota Yogyakarta' },
+                { nama: 'Wirobrajan', kabupaten: 'Kota Yogyakarta' },
+                // Sleman (17)
+                { nama: 'Berbah', kabupaten: 'Sleman' },
+                { nama: 'Cangkringan', kabupaten: 'Sleman' },
+                { nama: 'Depok', kabupaten: 'Sleman' },
+                { nama: 'Gamping', kabupaten: 'Sleman' },
+                { nama: 'Godean', kabupaten: 'Sleman' },
+                { nama: 'Kalasan', kabupaten: 'Sleman' },
+                { nama: 'Minggir', kabupaten: 'Sleman' },
+                { nama: 'Mlati', kabupaten: 'Sleman' },
+                { nama: 'Moyudan', kabupaten: 'Sleman' },
+                { nama: 'Ngaglik', kabupaten: 'Sleman' },
+                { nama: 'Ngemplak', kabupaten: 'Sleman' },
+                { nama: 'Pakem', kabupaten: 'Sleman' },
+                { nama: 'Prambanan', kabupaten: 'Sleman' },
+                { nama: 'Seyegan', kabupaten: 'Sleman' },
+                { nama: 'Sleman', kabupaten: 'Sleman' },
+                { nama: 'Tempel', kabupaten: 'Sleman' },
+                { nama: 'Turi', kabupaten: 'Sleman' },
+                // Bantul (17)
+                { nama: 'Bambanglipuro', kabupaten: 'Bantul' },
+                { nama: 'Banguntapan', kabupaten: 'Bantul' },
+                { nama: 'Bantul', kabupaten: 'Bantul' },
+                { nama: 'Dlingo', kabupaten: 'Bantul' },
+                { nama: 'Imogiri', kabupaten: 'Bantul' },
+                { nama: 'Jetis', kabupaten: 'Bantul' },
+                { nama: 'Kasihan', kabupaten: 'Bantul' },
+                { nama: 'Kretek', kabupaten: 'Bantul' },
+                { nama: 'Pajangan', kabupaten: 'Bantul' },
+                { nama: 'Pandak', kabupaten: 'Bantul' },
+                { nama: 'Piyungan', kabupaten: 'Bantul' },
+                { nama: 'Pleret', kabupaten: 'Bantul' },
+                { nama: 'Pundong', kabupaten: 'Bantul' },
+                { nama: 'Sanden', kabupaten: 'Bantul' },
+                { nama: 'Sedayu', kabupaten: 'Bantul' },
+                { nama: 'Sewon', kabupaten: 'Bantul' },
+                { nama: 'Srandakan', kabupaten: 'Bantul' },
+                // Kulon Progo (12)
+                { nama: 'Galur', kabupaten: 'Kulon Progo' },
+                { nama: 'Girimulyo', kabupaten: 'Kulon Progo' },
+                { nama: 'Kalibawang', kabupaten: 'Kulon Progo' },
+                { nama: 'Kokap', kabupaten: 'Kulon Progo' },
+                { nama: 'Lendah', kabupaten: 'Kulon Progo' },
+                { nama: 'Nanggulan', kabupaten: 'Kulon Progo' },
+                { nama: 'Panjatan', kabupaten: 'Kulon Progo' },
+                { nama: 'Pengasih', kabupaten: 'Kulon Progo' },
+                { nama: 'Samigaluh', kabupaten: 'Kulon Progo' },
+                { nama: 'Sentolo', kabupaten: 'Kulon Progo' },
+                { nama: 'Temon', kabupaten: 'Kulon Progo' },
+                { nama: 'Wates', kabupaten: 'Kulon Progo' },
+                // Gunungkidul (18)
+                { nama: 'Gedangsari', kabupaten: 'Gunungkidul' },
+                { nama: 'Girisubo', kabupaten: 'Gunungkidul' },
+                { nama: 'Karangmojo', kabupaten: 'Gunungkidul' },
+                { nama: 'Ngawen', kabupaten: 'Gunungkidul' },
+                { nama: 'Nglipar', kabupaten: 'Gunungkidul' },
+                { nama: 'Paliyan', kabupaten: 'Gunungkidul' },
+                { nama: 'Panggang', kabupaten: 'Gunungkidul' },
+                { nama: 'Patuk', kabupaten: 'Gunungkidul' },
+                { nama: 'Playen', kabupaten: 'Gunungkidul' },
+                { nama: 'Ponjong', kabupaten: 'Gunungkidul' },
+                { nama: 'Purwosari', kabupaten: 'Gunungkidul' },
+                { nama: 'Rongkop', kabupaten: 'Gunungkidul' },
+                { nama: 'Saptosari', kabupaten: 'Gunungkidul' },
+                { nama: 'Semanu', kabupaten: 'Gunungkidul' },
+                { nama: 'Semin', kabupaten: 'Gunungkidul' },
+                { nama: 'Tanjungsari', kabupaten: 'Gunungkidul' },
+                { nama: 'Tepus', kabupaten: 'Gunungkidul' },
+                { nama: 'Wonosari', kabupaten: 'Gunungkidul' }
+            ];
+
+            const KABUPATEN_NAMES = ['Kota Yogyakarta', 'Sleman', 'Bantul', 'Kulon Progo', 'Gunungkidul'];
+            const KABUPATEN_COORDS = {
+                'Kota Yogyakarta': [110.3644, -7.7956],
+                'Sleman': [110.3237, -7.6799],
+                'Bantul': [110.3269, -7.8881],
+                'Kulon Progo': [110.1524, -7.7543],
+                'Gunungkidul': [110.6197, -7.9843]
+            };
+            const BOUNDS = {
+                temp: { min: 24, max: 35 },
+                rain: { min: 10, max: 320 },
+                humidity: { min: 55, max: 98 },
+                wind: { min: 1, max: 22 }
+            };
+
+            // ---- PALET WARNA KONTRAST ----
+            const RISK_LEVELS = [
+                { key: 'very-low', label: 'Sangat Rendah', color: '#27ae60', scoreMin: 0, scoreMax: 20 },
+                { key: 'low', label: 'Rendah', color: '#2e86c1', scoreMin: 21, scoreMax: 40 },
+                { key: 'medium', label: 'Sedang', color: '#f1c40f', scoreMin: 41, scoreMax: 60 },
+                { key: 'high', label: 'Tinggi', color: '#e67e22', scoreMin: 61, scoreMax: 80 },
+                { key: 'very-high', label: 'Sangat Tinggi', color: '#e74c3c', scoreMin: 81, scoreMax: 100 }
+            ];
+
+            // ---- STATE ----
+            let map1, map2, geoJsonLayer1, geoJsonLayer2, fallbackCircles1 = [],
+                fallbackCircles2 = [];
+            let kabupatenData = {},
+                kecamatanData = {};
+            let isGeoJSONLoaded = false;
+            let chartRisk, chartClimate, chartTrend, chartRiskAnalytics, chartClimateAnalytics;
+            let mapInit1 = false,
+                mapInit2 = false;
+            let allKecamatanData = []; // data lengkap dengan cuaca & risiko
+            let filteredKecamatanData = [];
+            let currentPage = 1;
+            let rowsPerPage = 20;
+            let searchQuery = '';
+            let filterKabupaten = 'all';
+            const $riskFilters = document.querySelectorAll('.risk-filter');
+
+            // DOM
+            const $clock = document.getElementById('clock');
+            const $updateInfo = document.getElementById('updateInfo');
+            const $toast = document.getElementById('toast');
+            const $toastTitle = document.getElementById('toastTitle');
+            const $toastBody = document.getElementById('toastBody');
+            const $alertLog = document.getElementById('alertLog');
+            const $tableBody = document.getElementById('tableBody');
+            const $tableBody2 = document.getElementById('tableBody2');
+            const $searchInput = document.getElementById('searchKecamatan');
+            const $filterKabupaten = document.getElementById('filterKabupaten');
+            const $resetFilterBtn = document.getElementById('resetFilterBtn');
+            const $prevPageBtn = document.getElementById('prevPageBtn');
+            const $nextPageBtn = document.getElementById('nextPageBtn');
+            const $pageInfo = document.getElementById('pageInfo');
+            const $rowsPerPage = document.getElementById('rowsPerPage');
+            const $totalKecamatanDisplay = document.getElementById('totalKecamatanDisplay');
+
+            // ---- HELPERS ----
+            function randomBetween(min, max) { return Math.round((Math.random() * (max - min) + min) * 10) / 10; }
+
+            function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+
+            function getRiskLevel(score) {
+                for (const level of RISK_LEVELS) {
+                    if (score >= level.scoreMin && score <= level.scoreMax) return level;
+                }
+                return RISK_LEVELS[0];
+            }
+
+            // ---- PERHITUNGAN RISIKO ----
+            function calculateRisk(data) {
+                let tempScore = 0,
+                    t = data.temp;
+                if (t >= 27 && t <= 30) tempScore = 100;
+                else if (t >= 25 && t < 27) tempScore = 70 + (t - 25) * 15;
+                else if (t > 30 && t <= 33) tempScore = 100 - (t - 30) * 20;
+                else if (t > 33) tempScore = 40;
+                else if (t < 25) tempScore = 40 + (t - 24) * 30;
+                tempScore = clamp(tempScore, 0, 100);
+
+                let rainScore = clamp((data.rain / 250) * 100, 0, 100);
+                let humidityScore = 0,
+                    h = data.humidity;
+                if (h >= 80) humidityScore = 100;
+                else if (h >= 70) humidityScore = 60 + (h - 70) * 4;
+                else if (h >= 60) humidityScore = 20 + (h - 60) * 4;
+                else humidityScore = clamp((h - 50) * 2, 0, 20);
+
+                let windScore = 0,
+                    w = data.wind;
+                if (w <= 3) windScore = 100;
+                else if (w <= 8) windScore = 80 - (w - 3) * 4;
+                else if (w <= 15) windScore = 60 - (w - 8) * 3;
+                else windScore = 20;
+                windScore = clamp(windScore, 0, 100);
+
+                return Math.round(clamp((tempScore * 0.35) + (rainScore * 0.30) + (humidityScore * 0.20) + (windScore *
+                    0.15), 0, 100));
+            }
+
+            // ---- GENERATE DATA KECAMATAN ----
+            function generateKecamatanData(kec, kabData) {
+                const variance = randomBetween(-15, 15);
+                let score = clamp(kabData.score + variance, 0, 100);
+                const level = getRiskLevel(score);
+                const temp = clamp(kabData.temp + randomBetween(-2, 2), BOUNDS.temp.min, BOUNDS.temp.max);
+                const rain = clamp(kabData.rain + randomBetween(-20, 20), BOUNDS.rain.min, BOUNDS.rain.max);
+                const humidity = clamp(kabData.humidity + randomBetween(-5, 5), BOUNDS.humidity.min, BOUNDS.humidity.max);
+                const wind = clamp(kabData.wind + randomBetween(-2, 2), BOUNDS.wind.min, BOUNDS.wind.max);
+                return {
+                    nama: kec.nama,
+                    kabupaten: kec.kabupaten,
+                    temp: Math.round(temp * 10) / 10,
+                    rain: Math.round(rain * 10) / 10,
+                    humidity: Math.round(humidity * 10) / 10,
+                    wind: Math.round(wind * 10) / 10,
+                    score,
+                    riskKey: level.key,
+                    riskLabel: level.label,
+                    riskColor: level.color,
+                };
+            }
+
+            function generateAllKecamatanData() {
+                // Update kabupaten data dulu
+                updateKabupatenData();
+                allKecamatanData = ALL_KECAMATAN.map(kec => {
+                    const kabData = kabupatenData[kec.kabupaten] || kabupatenData[KABUPATEN_NAMES[0]];
+                    return generateKecamatanData(kec, kabData);
+                });
+                // Urutkan berdasarkan skor tertinggi
+                allKecamatanData.sort((a, b) => b.score - a.score);
+                filteredKecamatanData = [...allKecamatanData];
+                return allKecamatanData;
+            }
+
+            // ---- DATA KABUPATEN ----
+            function generateKabupatenData(name, existing) {
+                const base = existing || {};
+                const walk = (old, min, max, step) => {
+                    if (old === undefined) return randomBetween(min, max);
+                    let v = old + randomBetween(-step, step);
+                    return clamp(v, min, max);
+                };
+                const temp = Math.round(walk(base.temp, BOUNDS.temp.min, BOUNDS.temp.max, 0.8) * 10) / 10;
+                const rain = Math.round(walk(base.rain, BOUNDS.rain.min, BOUNDS.rain.max, 12) * 10) / 10;
+                const humidity = Math.round(walk(base.humidity, BOUNDS.humidity.min, BOUNDS.humidity.max, 2.5) * 10) / 10;
+                const wind = Math.round(walk(base.wind, BOUNDS.wind.min, BOUNDS.wind.max, 1.2) * 10) / 10;
+                const data = { temp, rain, humidity, wind };
+                const score = calculateRisk(data);
+                const level = getRiskLevel(score);
+                return { name, ...data, score, riskKey: level.key, riskLabel: level.label, riskColor: level.color };
+            }
+
+            function updateKabupatenData() {
+                KABUPATEN_NAMES.forEach(name => {
+                    kabupatenData[name] = generateKabupatenData(name, kabupatenData[name]);
+                });
+            }
+
+            function initKabupatenData() {
+                KABUPATEN_NAMES.forEach(name => {
+                    kabupatenData[name] = generateKabupatenData(name, null);
+                });
+            }
+
+            // ---- PETA ----
+            function initMaps() {
+                if (!mapInit1) {
+                    map1 = L.map('map').setView([-7.8, 110.4], 10);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap',
+                        maxZoom: 19,
+                    }).addTo(map1);
+                    mapInit1 = true;
+                }
+                if (!mapInit2) {
+                    map2 = L.map('map2').setView([-7.8, 110.4], 10);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap',
+                        maxZoom: 19,
+                    }).addTo(map2);
+                    mapInit2 = true;
+                }
+                loadGeoJSON();
+            }
+
+            const GEOJSON_SOURCES = [
+                'https://raw.githubusercontent.com/indonesia-geojson/indonesia-geojson/master/kecamatan/34-daerah-istimewa-yogyakarta.geojson',
+                'https://raw.githubusercontent.com/kelvinharyono/geojson-indonesia/master/kabupaten/34-daerah-istimewa-yogyakarta.json',
+                'https://raw.githubusercontent.com/putrapradana/geojson-indonesia/master/daerah-istimewa-yogyakarta/kecamatan.json'
+            ];
+
+            function loadGeoJSON() {
+                let attempt = 0,
+                    loaded = false;
+
+                function tryNext() {
+                    if (attempt >= GEOJSON_SOURCES.length || loaded) {
+                        if (!loaded) {
+                            console.warn('GeoJSON gagal, fallback lingkaran.');
+                            renderFallbackCircles();
+                        }
+                        return;
+                    }
+                    const url = GEOJSON_SOURCES[attempt++];
+                    fetch(url)
+                        .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+                        .then(data => {
+                            if (data && (data.features || Array.isArray(data))) {
+                                console.log('✅ GeoJSON dari:', url);
+                                loaded = true;
+                                isGeoJSONLoaded = true;
+                                renderGeoJSON(data);
+                            } else throw new Error('Data tidak valid');
+                        })
+                        .catch(err => { console.warn('❌ Gagal', url, err.message);
+                            tryNext(); });
+                }
+                tryNext();
+            }
+
+            function renderGeoJSON(data) {
+                if (geoJsonLayer1) map1.removeLayer(geoJsonLayer1);
+                if (geoJsonLayer2) map2.removeLayer(geoJsonLayer2);
+                if (fallbackCircles1.length) { fallbackCircles1.forEach(c => map1.removeLayer(c));
+                    fallbackCircles1 = []; }
+                if (fallbackCircles2.length) { fallbackCircles2.forEach(c => map2.removeLayer(c));
+                    fallbackCircles2 = []; }
+
+                const style = { weight: 1, color: '#2c3e50', fillColor: '#3498db', fillOpacity: 0.3 };
+
+                const onEach = function(feature, layer) {
+                    const props = feature.properties;
+                    let name = props.kecamatan || props.nama || props.NAMA_KEC || props.KECAMATAN || props.kabupaten ||
+                        props.KABUPATEN || 'Wilayah';
+                    layer._nama = name;
+                    layer.on('click', function() {
+                        const d = layer._kecData;
+                        if (d) {
+                            layer.bindPopup(`
+                                <strong>${d.nama}</strong><br>
+                                ${d.kabupaten ? 'Kabupaten: '+d.kabupaten+'<br>' : ''}
+                                <span style="color:${d.riskColor};font-weight:bold;">Risiko: ${d.riskLabel} (${d.score})</span><br>
+                                🌡️ ${d.temp}°C | 🌧️ ${d.rain} mm<br>
+                                💧 ${d.humidity}% | 💨 ${d.wind} km/h
+                            `).openPopup();
+                        }
+                    });
+                    if (name && name !== 'Wilayah') {
+                        layer.bindTooltip(name, { permanent: false, direction: 'center', className: 'kecamatan-label' });
+                    }
+                };
+
+                geoJsonLayer1 = L.geoJSON(data, { style, onEachFeature: onEach }).addTo(map1);
+                geoJsonLayer2 = L.geoJSON(data, { style, onEachFeature: onEach }).addTo(map2);
+
+                // Update kecamatan data dari GeoJSON
+                updateKecamatanDataFromGeoJSON();
+                updateGeoJSONStyle();
+                updateAllUI();
+                try {
+                    const bounds = geoJsonLayer1.getBounds().pad(0.1);
+                    map1.fitBounds(bounds);
+                    map2.fitBounds(bounds);
+                } catch (e) {}
+            }
+
+            function updateKecamatanDataFromGeoJSON() {
+                if (!geoJsonLayer1) return;
+                const newData = {};
+                geoJsonLayer1.eachLayer(layer => {
+                    if (layer.feature) {
+                        const props = layer.feature.properties;
+                        const name = props.kecamatan || props.nama || props.NAMA_KEC || props.KECAMATAN || props
+                            .kabupaten || props.KABUPATEN || 'Wilayah';
+                        let kabRef = KABUPATEN_NAMES.find(k =>
+                            name.toLowerCase().includes(k.toLowerCase()) ||
+                            k.toLowerCase().includes(name.toLowerCase())
+                        );
+                        if (!kabRef) {
+                            const kabProp = props.kabupaten || props.KABUPATEN || '';
+                            kabRef = KABUPATEN_NAMES.find(k =>
+                                kabProp.toLowerCase().includes(k.toLowerCase()) ||
+                                k.toLowerCase().includes(kabProp.toLowerCase())
+                            );
+                        }
+                        if (!kabRef) kabRef = KABUPATEN_NAMES[0];
+                        const kabData = kabupatenData[kabRef] || kabupatenData[KABUPATEN_NAMES[0]];
+                        const variance = randomBetween(-15, 15);
+                        let score = clamp(kabData.score + variance, 0, 100);
+                        const level = getRiskLevel(score);
+                        const temp = clamp(kabData.temp + randomBetween(-2, 2), BOUNDS.temp.min, BOUNDS.temp.max);
+                        const rain = clamp(kabData.rain + randomBetween(-20, 20), BOUNDS.rain.min, BOUNDS.rain.max);
+                        const humidity = clamp(kabData.humidity + randomBetween(-5, 5), BOUNDS.humidity.min, BOUNDS
+                            .humidity.max);
+                        const wind = clamp(kabData.wind + randomBetween(-2, 2), BOUNDS.wind.min, BOUNDS.wind.max);
+                        const data = {
+                            nama: name,
+                            kabupaten: kabRef,
+                            temp: Math.round(temp * 10) / 10,
+                            rain: Math.round(rain * 10) / 10,
+                            humidity: Math.round(humidity * 10) / 10,
+                            wind: Math.round(wind * 10) / 10,
+                            score,
+                            riskKey: level.key,
+                            riskLabel: level.label,
+                            riskColor: level.color,
+                        };
+                        const id = layer.feature.id || layer.feature.properties.id || layer._leaflet_id;
+                        newData[id] = data;
+                        layer._kecData = data;
+                        if (geoJsonLayer2) {
+                            geoJsonLayer2.eachLayer(l2 => {
+                                if (l2._leaflet_id === layer._leaflet_id) l2._kecData = data;
+                            });
+                        }
+                    }
+                });
+                kecamatanData = newData;
+            }
+
+            function updateGeoJSONStyle() {
+                const activeFilters = Array.from($riskFilters).filter(cb => cb.checked).map(cb => cb.value);
+                [geoJsonLayer1, geoJsonLayer2].forEach(layer => {
+                    if (!layer) return;
+                    layer.eachLayer(l => {
+                        const d = l._kecData;
+                        if (d) {
+                            const visible = activeFilters.includes(d.riskKey);
+                            l.setStyle({
+                                fillColor: d.riskColor,
+                                fillOpacity: visible ? 0.7 : 0.08,
+                                weight: visible ? 1.5 : 0.5,
+                                color: visible ? '#2c3e50' : '#bdc3c7',
+                                opacity: visible ? 0.9 : 0.1,
+                            });
+                            if (!visible) l.closePopup();
+                        }
+                    });
+                });
+            }
+
+            // ---- FALLBACK LINGKARAN ----
+            function renderFallbackCircles() {
+                if (geoJsonLayer1) map1.removeLayer(geoJsonLayer1);
+                if (geoJsonLayer2) map2.removeLayer(geoJsonLayer2);
+                if (fallbackCircles1.length) { fallbackCircles1.forEach(c => map1.removeLayer(c));
+                    fallbackCircles1 = []; }
+                if (fallbackCircles2.length) { fallbackCircles2.forEach(c => map2.removeLayer(c));
+                    fallbackCircles2 = []; }
+
+                const makeCircles = (map, arr) => {
+                    for (const name of KABUPATEN_NAMES) {
+                        const data = kabupatenData[name];
+                        const [lng, lat] = KABUPATEN_COORDS[name] || [110, -7.8];
+                        const radius = 8000 + (data.score / 100) * 22000;
+                        const circle = L.circle([lat, lng], {
+                            radius: radius,
+                            color: data.riskColor,
+                            fillColor: data.riskColor,
+                            fillOpacity: 0.5,
+                            weight: 2,
+                            opacity: 0.8,
+                        }).addTo(map);
+                        circle.bindTooltip(
+                            `<strong>${name}</strong><br>Risiko: ${data.riskLabel} (${data.score})<br>Suhu: ${data.temp}°C | Hujan: ${data.rain} mm`
+                            );
+                        arr.push(circle);
+                    }
+                    if (arr.length) {
+                        const group = L.featureGroup(arr);
+                        map.fitBounds(group.getBounds().pad(0.1));
+                    }
+                };
+                makeCircles(map1, fallbackCircles1);
+                makeCircles(map2, fallbackCircles2);
+                isGeoJSONLoaded = false;
+                updateAllUI();
+            }
+
+            // ---- UPDATE UI ----
+            function updateAllUI() {
+                // Regenerate all kecamatan data
+                generateAllKecamatanData();
+                updateStatsAndCharts();
+                updateTable();
+                updateTable2();
+            }
+
+            function updateStatsAndCharts() {
+                const dataList = allKecamatanData;
+                let total = dataList.length,
+                    veryHigh = 0,
+                    high = 0,
+                    low = 0;
+                let sumTemp = 0,
+                    sumRain = 0;
+                dataList.forEach(d => {
+                    if (d.riskKey === 'very-high') veryHigh++;
+                    else if (d.riskKey === 'high') high++;
+                    else if (d.riskKey === 'low' || d.riskKey === 'very-low') low++;
+                    sumTemp += d.temp;
+                    sumRain += d.rain;
+                });
+
+                document.getElementById('totalRegions').textContent = total;
+                document.getElementById('veryHighCount').textContent = veryHigh;
+                document.getElementById('highCount').textContent = high;
+                document.getElementById('lowCount').textContent = low;
+                document.getElementById('avgTemp').innerHTML = `${total > 0 ? (sumTemp/total).toFixed(1) : '--'} <span class="unit">°C</span>`;
+                document.getElementById('avgRain').innerHTML = `${total > 0 ? (sumRain/total).toFixed(1) : '--'} <span class="unit">mm</span>`;
+
+                const counts = { 'very-low': 0, low: 0, medium: 0, high: 0, 'very-high': 0 };
+                dataList.forEach(d => counts[d.riskKey] = (counts[d.riskKey] || 0) + 1);
+                document.getElementById('distVeryLow').textContent = counts['very-low'];
+                document.getElementById('distLow').textContent = counts.low;
+                document.getElementById('distMedium').textContent = counts.medium;
+                document.getElementById('distHigh').textContent = counts.high;
+                document.getElementById('distVeryHigh').textContent = counts['very-high'];
+
+                updateRiskChart(counts);
+                updateClimateChart(dataList);
+                updateAnalyticsCharts(counts, dataList);
+            }
+
+            function updateRiskChart(counts) {
+                const labels = ['Sangat Rendah', 'Rendah', 'Sedang', 'Tinggi', 'Sangat Tinggi'];
+                const keys = ['very-low', 'low', 'medium', 'high', 'very-high'];
+                const data = keys.map(k => counts[k] || 0);
+                const colors = ['#27ae60', '#2e86c1', '#f1c40f', '#e67e22', '#e74c3c'];
+                const ctx = document.getElementById('riskChart');
+                if (!ctx) return;
+                if (chartRisk) chartRisk.destroy();
+                chartRisk = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: colors.map(c => c +
+                            'cc'), borderWidth: 2 }] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(ctx) {
+                                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                        const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0;
+                                        return `${ctx.label}: ${ctx.parsed} wilayah (${pct}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '65%',
+                    }
+                });
+            }
+
+            function updateClimateChart(dataList) {
+                const sliced = dataList.slice(0, 10);
+                const labels = sliced.map(d => d.nama || d.name || '');
+                const temps = sliced.map(d => d.temp);
+                const rains = sliced.map(d => d.rain);
+                const ctx = document.getElementById('climateChart');
+                if (!ctx) return;
+                if (chartClimate) chartClimate.destroy();
+                chartClimate = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'Suhu (°C)', data: temps, backgroundColor: 'rgba(52,152,219,0.7)',
+                                borderColor: '#2c3e50', borderWidth: 1 },
+                            { label: 'Hujan (mm)', data: rains, backgroundColor: 'rgba(52,152,219,0.4)',
+                                borderColor: '#2c3e50', borderWidth: 1 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#2c3e50', font: { size: 10 } } } },
+                        scales: {
+                            y: { ticks: { color: '#2c3e50', font: { size: 9 } }, grid: { color: 'rgba(44,62,80,0.05)' } },
+                            x: { ticks: { color: '#2c3e50', font: { size: 8 } }, grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            function updateAnalyticsCharts(counts, dataList) {
+                const labels = ['Sangat Rendah', 'Rendah', 'Sedang', 'Tinggi', 'Sangat Tinggi'];
+                const keys = ['very-low', 'low', 'medium', 'high', 'very-high'];
+                const data = keys.map(k => counts[k] || 0);
+                const colors = ['#27ae60', '#2e86c1', '#f1c40f', '#e67e22', '#e74c3c'];
+                const ctx1 = document.getElementById('riskChartAnalytics');
+                if (ctx1) {
+                    if (chartRiskAnalytics) chartRiskAnalytics.destroy();
+                    chartRiskAnalytics = new Chart(ctx1, {
+                        type: 'doughnut',
+                        data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: colors.map(c =>
+                                c + 'cc'), borderWidth: 2 }] },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { labels: { color: '#2c3e50', font: { size: 11 } } } },
+                            cutout: '60%',
+                        }
+                    });
+                }
+
+                const sliced = dataList.slice(0, 10);
+                const lbls = sliced.map(d => d.nama || d.name || '');
+                const tmps = sliced.map(d => d.temp);
+                const rns = sliced.map(d => d.rain);
+                const ctx2 = document.getElementById('climateChartAnalytics');
+                if (ctx2) {
+                    if (chartClimateAnalytics) chartClimateAnalytics.destroy();
+                    chartClimateAnalytics = new Chart(ctx2, {
+                        type: 'bar',
+                        data: {
+                            labels: lbls,
+                            datasets: [
+                                { label: 'Suhu (°C)', data: tmps, backgroundColor: 'rgba(52,152,219,0.7)',
+                                    borderColor: '#2c3e50', borderWidth: 1 },
+                                { label: 'Hujan (mm)', data: rns, backgroundColor: 'rgba(52,152,219,0.4)',
+                                    borderColor: '#2c3e50', borderWidth: 1 }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { labels: { color: '#2c3e50', font: { size: 10 } } } },
+                            scales: {
+                                y: { ticks: { color: '#2c3e50', font: { size: 9 } }, grid: { color: 'rgba(44,62,80,0.05)' } },
+                                x: { ticks: { color: '#2c3e50', font: { size: 8 } }, grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+
+                const ctx3 = document.getElementById('trendChart');
+                if (ctx3) {
+                    if (chartTrend) chartTrend.destroy();
+                    const trendLabels = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+                    // Hitung rata-rata skor per hari (simulasi)
+                    const avgScore = dataList.reduce((s, d) => s + d.score, 0) / dataList.length;
+                    const trendData = [
+                        Math.round(avgScore * 0.85),
+                        Math.round(avgScore * 0.90),
+                        Math.round(avgScore * 0.88),
+                        Math.round(avgScore * 0.92),
+                        Math.round(avgScore * 0.95),
+                        Math.round(avgScore * 0.93),
+                        Math.round(avgScore * 0.98)
+                    ];
+                    chartTrend = new Chart(ctx3, {
+                        type: 'line',
+                        data: {
+                            labels: trendLabels,
+                            datasets: [{
+                                label: 'Skor Risiko Rata-rata',
+                                data: trendData,
+                                borderColor: '#3498db',
+                                backgroundColor: 'rgba(52,152,219,0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointBackgroundColor: '#3498db',
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { labels: { color: '#2c3e50', font: { size: 10 } } } },
+                            scales: {
+                                y: { ticks: { color: '#2c3e50', font: { size: 9 } }, grid: { color: 'rgba(44,62,80,0.05)' },
+                                    min: 0, max: 100 },
+                                x: { ticks: { color: '#2c3e50', font: { size: 9 } }, grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // ---- TABEL 1 (dashboard) ----
+            function updateTable() {
+                const dataList = allKecamatanData.slice(0, 20);
+                let html = '';
+                dataList.forEach((d, i) => {
+                    html += `<tr>
+                        <td>${i+1}</td>
+                        <td>${d.nama || '-'}</td>
+                        <td>${d.kabupaten || '-'}</td>
+                        <td>${d.temp}</td>
+                        <td>${d.rain}</td>
+                        <td>${d.humidity || '-'}</td>
+                        <td>${d.wind || '-'}</td>
+                        <td><span class="risk-badge" style="background:${d.riskColor};color:#fff;">${d.riskLabel}</span></td>
+                        <td>${d.score}</td>
+                    </tr>`;
+                });
+                if ($tableBody) $tableBody.innerHTML = html;
+            }
+
+            // ---- TABEL 2 (data lengkap dengan filter) ----
+            function applyFilters2() {
+                searchQuery = $searchInput.value.toLowerCase().trim();
+                filterKabupaten = $filterKabupaten.value;
+
+                filteredKecamatanData = allKecamatanData.filter(d => {
+                    const matchNama = d.nama.toLowerCase().includes(searchQuery);
+                    const matchKab = filterKabupaten === 'all' || d.kabupaten === filterKabupaten;
+                    return matchNama && matchKab;
+                });
+
+                // Urutkan berdasarkan skor tertinggi
+                filteredKecamatanData.sort((a, b) => b.score - a.score);
+                currentPage = 1;
+                renderTable2();
+            }
+
+            function renderTable2() {
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = Math.min(start + rowsPerPage, filteredKecamatanData.length);
+                const pageData = filteredKecamatanData.slice(start, end);
+
+                let html = '';
+                pageData.forEach((d, idx) => {
+                    const no = start + idx + 1;
+                    html += `<tr>
+                        <td>${no}</td>
+                        <td>${d.nama}</td>
+                        <td>${d.kabupaten}</td>
+                        <td>${d.temp}</td>
+                        <td>${d.rain}</td>
+                        <td>${d.humidity}</td>
+                        <td>${d.wind}</td>
+                        <td><span class="risk-badge" style="background:${d.riskColor};color:#fff;">${d.riskLabel}</span></td>
+                        <td>${d.score}</td>
+                    </tr>`;
+                });
+
+                if (pageData.length === 0) {
+                    html = `<tr><td colspan="9" style="text-align:center; padding:20px; color:var(--text-muted);">Tidak ada data yang cocok dengan filter.</td></tr>`;
+                }
+
+                $tableBody2.innerHTML = html;
+                $totalKecamatanDisplay.textContent = `Total: ${filteredKecamatanData.length} kecamatan`;
+
+                const totalPages = Math.ceil(filteredKecamatanData.length / rowsPerPage) || 1;
+                $pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
+                $prevPageBtn.disabled = currentPage <= 1;
+                $nextPageBtn.disabled = currentPage >= totalPages;
+            }
+
+            function updateTable2() {
+                applyFilters2();
+            }
+
+            function goToPage(page) {
+                const totalPages = Math.ceil(filteredKecamatanData.length / rowsPerPage) || 1;
+                if (page < 1 || page > totalPages) return;
+                currentPage = page;
+                renderTable2();
+            }
+
+            // ---- ALERT & TOAST ----
+            function checkAlerts() {
+                const dataList = allKecamatanData;
+                const highRisk = dataList.filter(r => r.riskKey === 'high' || r.riskKey === 'very-high');
+                if (highRisk.length === 0) return;
+                const worst = highRisk.sort((a, b) => b.score - a.score)[0];
+                const name = worst.nama || 'Wilayah';
+                const levelLabel = worst.riskKey === 'very-high' ? 'SANGAT TINGGI' : 'TINGGI';
+                $toastTitle.textContent = `⚠️ Peringatan DBD — ${name}`;
+                $toastBody.textContent =
+                    `Wilayah ${name} risiko ${levelLabel} (${worst.score}). Suhu ${worst.temp}°C, hujan ${worst.rain}mm.`;
+                $toast.classList.add('show');
+                clearTimeout(window._toastTimer);
+                window._toastTimer = setTimeout(() => $toast.classList.remove('show'), 6000);
+
+                const time = new Date();
+                const pad = n => String(n).padStart(2, '0');
+                const tStr = `${pad(time.getHours())}:${pad(time.getMinutes())}:${pad(time.getSeconds())}`;
+                const log = document.getElementById('alertLog');
+                if (log.children.length === 1 && log.children[0].textContent.includes('Menunggu')) log.innerHTML = '';
+                log.insertAdjacentHTML('afterbegin', `
+                    <div class="alert-item alert-${worst.riskKey === 'very-high' ? 'red' : 'orange'}">
+                        <span>🔴 ${name} — ${levelLabel} (${worst.score})</span>
+                        <span class="a-time">${tStr}</span>
+                    </div>
+                `);
+                while (log.children.length > 20) log.removeChild(log.lastChild);
+            }
+
+            // ---- JAM ----
+            function updateClock() {
+                const now = new Date();
+                const pad = n => String(n).padStart(2, '0');
+                $clock.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+            }
+
+            function updateTimestamp() {
+                const now = new Date();
+                const pad = n => String(n).padStart(2, '0');
+                $updateInfo.textContent = `Diperbarui: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+            }
+
+            // ---- FILTER ----
+            function applyFilters() {
+                if (isGeoJSONLoaded && geoJsonLayer1) {
+                    updateGeoJSONStyle();
+                }
+                // Update tabel juga
+                applyFilters2();
+            }
+
+            // ---- UPDATE CYCLE ----
+            function fullUpdate() {
+                updateKabupatenData();
+                generateAllKecamatanData();
+
+                if (isGeoJSONLoaded && geoJsonLayer1) {
+                    updateKecamatanDataFromGeoJSON();
+                    updateGeoJSONStyle();
+                } else {
+                    if (fallbackCircles1.length) {
+                        fallbackCircles1.forEach(c => map1.removeLayer(c));
+                        fallbackCircles1 = [];
+                        fallbackCircles2.forEach(c => map2.removeLayer(c));
+                        fallbackCircles2 = [];
+                        renderFallbackCircles();
+                    } else {
+                        renderFallbackCircles();
+                    }
+                }
+                updateAllUI();
+                updateTimestamp();
+                checkAlerts();
+            }
+
+            // ---- SIDEBAR NAVIGATION ----
+            function initNavigation() {
+                const links = document.querySelectorAll('.sidebar-link');
+                const tabs = {
+                    '#dashboard': document.getElementById('dashboard'),
+                    '#map-tab': document.getElementById('map-tab'),
+                    '#data-tab': document.getElementById('data-tab'),
+                    '#analytics-tab': document.getElementById('analytics-tab'),
+                    '#about-tab': document.getElementById('about-tab'),
+                };
+                links.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const target = this.getAttribute('href');
+                        links.forEach(l => l.classList.remove('active'));
+                        Object.values(tabs).forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        if (tabs[target]) tabs[target].classList.add('active');
+                        if (window.innerWidth <= 1024) {
+                            document.getElementById('sidebar').classList.remove('active');
+                        }
+                        setTimeout(() => {
+                            if (target === '#map-tab' || target === '#dashboard') {
+                                if (map1) map1.invalidateSize();
+                                if (map2) map2.invalidateSize();
+                            }
+                            if (target === '#data-tab') {
+                                applyFilters2();
+                            }
+                            if (target === '#analytics-tab') {
+                                updateAnalyticsCharts(
+                                    { 'very-low': 0, low: 0, medium: 0, high: 0, 'very-high': 0 },
+                                    allKecamatanData
+                                );
+                            }
+                        }, 200);
+                    });
+                });
+
+                document.querySelector('.map-nav-btn')?.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector('.sidebar-link[href="#map-tab"]')?.click();
+                });
+
+                document.getElementById('mobileMenuToggle')?.addEventListener('click', function() {
+                    document.getElementById('sidebar').classList.toggle('active');
+                });
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 1024) {
+                        const sidebar = document.getElementById('sidebar');
+                        const toggle = document.getElementById('mobileMenuToggle');
+                        if (!sidebar.contains(e.target) && !toggle.contains(e.target) && sidebar.classList
+                            .contains('active')) {
+                            sidebar.classList.remove('active');
+                        }
+                    }
+                });
+            }
+
+            // ---- INIT ----
+            function init() {
+                initKabupatenData();
+                generateAllKecamatanData();
+                initMaps();
+                updateClock();
+                updateTimestamp();
+                setInterval(updateClock, 1000);
+                setInterval(fullUpdate, 4000);
+                setTimeout(() => $toast.classList.remove('show'), 200);
+
+                $riskFilters.forEach(cb => {
+                    cb.addEventListener('change', applyFilters);
+                });
+
+                // Event listener untuk filter data
+                $searchInput.addEventListener('input', applyFilters2);
+                $filterKabupaten.addEventListener('change', applyFilters2);
+                $resetFilterBtn.addEventListener('click', function() {
+                    $searchInput.value = '';
+                    $filterKabupaten.value = 'all';
+                    applyFilters2();
+                });
+                $prevPageBtn.addEventListener('click', function() { goToPage(currentPage - 1); });
+                $nextPageBtn.addEventListener('click', function() { goToPage(currentPage + 1); });
+                $rowsPerPage.addEventListener('change', function() {
+                    rowsPerPage = parseInt(this.value);
+                    currentPage = 1;
+                    renderTable2();
+                });
+
+                initNavigation();
+
+                console.log('✅ DENTECH v2.1 (data kecamatan lengkap) siap.');
+            }
+
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+            else init();
+
+        })();
+    </script>
 </body>
 </html>
