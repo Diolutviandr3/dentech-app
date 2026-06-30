@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DENTECH - Peta Risiko DBD DIY (Kecamatan)</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="toast" id="toast">
+        <div class="toast-title" id="toastTitle">⚠️ Peringatan DBD</div>
+        <div class="toast-body" id="toastBody">Wilayah Yogyakarta masuk tingkat risiko TINGGI.</div>
+    </div>
+
+    <div class="app-container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">D</div>
+                <div>
+                    <h1>DENTECH</h1>
+                    <div class="sub">Prediksi DBD DIY &bull; Real-Time</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="live-badge"><span class="live-dot"></span><span>LIVE</span></div>
+                <div class="clock" id="clock">--:--:--</div>
+                <div class="update-info" id="updateInfo">Diperbarui: baru saja</div>
+            </div>
+        </header>
+
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card"><div class="stat-label">Total Kecamatan</div><div class="stat-value" id="totalRegions">0</div></div>
+            <div class="stat-card"><div class="stat-label">Risiko Sangat Tinggi</div><div class="stat-value highlight-very-high" id="veryHighCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Risiko Tinggi</div><div class="stat-value highlight-high" id="highCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Risiko Rendah / SR</div><div class="stat-value highlight-low" id="lowCount">0</div></div>
+            <div class="stat-card"><div class="stat-label">Rata-rata Suhu</div><div class="stat-value" id="avgTemp">-- <span class="unit">°C</span></div></div>
+            <div class="stat-card"><div class="stat-label">Rata-rata Curah Hujan</div><div class="stat-value" id="avgRain">-- <span class="unit">mm</span></div></div>
+        </div>
+
+        <div class="dashboard-main">
+            <section class="map-section">
+                <div class="map-header">
+                    <h2>Peta Risiko DBD per Kecamatan DIY</h2>
+                    <div class="legend">
+                        <span class="legend-item"><span class="legend-color" style="background:#1b5e20;"></span> Sangat Rendah</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#2e7d32;"></span> Rendah</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#43a047;"></span> Sedang</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#66bb6a;"></span> Tinggi</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#a5d6a7;"></span> Sangat Tinggi</span>
+                    </div>
+                </div>
+                <div id="map" style="height: 500px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(40,120,70,0.15);"></div>
+            </section>
+
+            <aside class="sidebar">
+                <div class="side-card">
+                    <h3>📊 Distribusi Risiko</h3>
+                    <div class="chart-wrap"><canvas id="riskChart"></canvas></div>
+                </div>
+                <div class="side-card">
+                    <h3>📋 Ringkasan Risiko</h3>
+                    <div class="dist-list" id="distList">
+                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#1b5e20;"></span>Sangat Rendah</span><span class="d-count" id="distVeryLow">0</span></div>
+                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#2e7d32;"></span>Rendah</span><span class="d-count" id="distLow">0</span></div>
+                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#43a047;"></span>Sedang</span><span class="d-count" id="distMedium">0</span></div>
+                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#66bb6a;"></span>Tinggi</span><span class="d-count" id="distHigh">0</span></div>
+                        <div class="dist-item"><span class="d-label"><span class="d-dot" style="background:#a5d6a7;"></span>Sangat Tinggi</span><span class="d-count" id="distVeryHigh">0</span></div>
+                    </div>
+                </div>
+                <div class="side-card">
+                    <h3>🔔 Log Peringatan</h3>
+                    <div class="alert-log" id="alertLog">
+                        <div class="alert-item" style="color:#5a8a6a; font-style:italic; border-left-color:#2a5a3a;">Menunggu data...</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <footer class="footer">
+            <div class="sources">
+                <span>📡 <span class="badge">BMKG</span> Suhu · Curah Hujan · Kelembapan · Angin</span>
+                <span>🛡️ <span class="badge">BPBD</span> Data Historis DBD</span>
+                <span>🗺️ <span class="badge">GeoJSON</span> Batas Kecamatan DIY</span>
+            </div>
+            <div>&copy; 2026 DENTECH &bull; v2.0 (Peta Kecamatan)</div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
